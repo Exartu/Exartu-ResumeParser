@@ -1,3 +1,4 @@
+if (Meteor.isServer){
 var stream = Npm.require('stream');
 var fs = Npm.require('fs');
 
@@ -308,3 +309,5 @@ var extractInformation = function (parseResult) {
 
     return employee;
   };
+}
+
