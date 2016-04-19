@@ -88,26 +88,34 @@ var extractInformation = function (parseResult) {
 
     //active and process status
     try {
+      var user = Meteor.user() || {};
+      var userHier;
+      if(user.currentHierId){
+        userHier = user.currentHierID;
+      }
+      else if(user.hierId){
+        userHier = user.hierId;
+      }
       var activeStatus = LookUps.findOne({
-        hierId: Meteor.user().currentHierId,
+        hierId: userHier,
         lookUpCode: Enums.lookUpCodes.active_status,
         isDefault: true
       });
       if (!activeStatus) {
         activeStatus = LookUps.findOne({
-          hierId: Meteor.user().currentHierId,
+          hierId: userHier,
           lookUpCode: Enums.lookUpCodes.active_status,
           lookUpActions: Enums.lookUpAction.Implies_Active
         });
       }
       var processStatus = LookUps.findOne({
-        hierId: Meteor.user().currentHierId,
+        hierId: userHier,
         lookUpCode: Enums.lookUpCodes.employee_status,
         isDefault: true
       });
       if (!processStatus) {
         processStatus = LookUps.findOne({
-          hierId: Meteor.user().currentHierId,
+          hierId: userHier,
           lookUpCode: Enums.lookUpCodes.employee_status
         });
       }
@@ -126,11 +134,23 @@ var extractInformation = function (parseResult) {
       employee.contactMethods = [];
       if (ContactInfo && ContactInfo && ContactInfo.ContactMethod) {
         var contactMethod = ContactInfo.ContactMethod;
-        var phoneTypeId = LookUpManager.ContactMethodTypes_MobilePhone()._id;
-        var emailTypeId = LookUpManager.ContactMethodTypes_Email()._id;
+        var user = Meteor.user() || {};
+        var userHier;
+        if(user.currentHierId){
+          userHier = user.currentHierId;
+        }
+        else if(user.hierId){
+          userHier = user.hierId;
+        }
+        var lookUpMobilPhone =  LookUps.findOne({
+          lookUpCode: Enums.lookUpTypes.contactMethod.type.lookUpCode,
+          hierId: userHier, lookUpActions: "ContactMethod_MobilePhone"});
+        var phoneTypeId = lookUpMobilPhone ._id;
+        var lookUpEmail = LookUps.findOne({
+          lookUpCode: Enums.lookUpTypes.contactMethod.type.lookUpCode,
+          hierId: userHier, lookUpActions: "ContactMethod_Email"});
+        var emailTypeId = lookUpEmail._id;
         _.each(contactMethod, function (cm) {
-
-
           if (cm.Telephone)
             _.each(cm.Telephone, function (telephone) {
               employee.contactMethods.push({
@@ -310,4 +330,5 @@ var extractInformation = function (parseResult) {
     return employee;
   };
 }
+
 
