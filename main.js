@@ -216,7 +216,8 @@ var extractInformation = function (parseResult) {
         _.each(structuredResult.Qualifications, function (qual) {
           _.each(qual.Competency, function (q) {
             if (q.$ && q.$.name)
-              employee.tags = _.uniq(employee.tags.push(q.$.name));
+              employee.tags.push(q.$.name)
+              employee.tags = _.uniq(employee.tags);
           })
         })
       }
