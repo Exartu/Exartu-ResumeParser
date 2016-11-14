@@ -4,7 +4,7 @@ var fs = Npm.require('fs');
 
 ResumeParser = function(configs){
   return {
-    parse: function (data) {
+    parse: function (data, user) {
       var form = new FormData();
       // handle a path
       if (_.isString(data)) {
@@ -53,8 +53,14 @@ ResumeParser = function(configs){
 
         var resumeXML = resumeeJson.XMLStructuredResumee;
         var resumeeObject = xml2jsAsync(resumeXML);
+        var info;
+        if(user){
+          info = extractInformation(resumeeObject, user);
+        }
+        else{
+          info = extractInformation(resumeeObject);
+        }
 
-        var info = extractInformation(resumeeObject);
         info.resumeText = resumeeJson.ResumeeText;
 
         return info;
@@ -62,8 +68,8 @@ ResumeParser = function(configs){
         return new Meteor.Error(500, "Error parsing resume");
       }
     },
-    extractInformation: function (information) {
-      return extractInformation(information);
+    extractInformation: function (information, user) {
+      return extractInformation(information, user);
     }
   }
 };
@@ -76,7 +82,7 @@ var xml2jsAsync = function (json) {
     return result;
 };
 
-var extractInformation = function (parseResult) {
+var extractInformation = function (parseResult, user) {
     var employee = {};
     employee.objNameArray = ['person', 'Employee', 'contactable'];
     employee.person = {
@@ -85,13 +91,14 @@ var extractInformation = function (parseResult) {
       lastName: ''
     };
     employee.Employee = {};
-
     //active and process status
     try {
-      var user = Meteor.user() || {};
+      if(!user) {
+        user = Meteor.user() || {};
+      }
       var userHier;
       if(user.currentHierId){
-        userHier = user.currentHierID;
+        userHier = user.currentHierId;
       }
       else if(user.hierId){
         userHier = user.hierId;
@@ -142,13 +149,16 @@ var extractInformation = function (parseResult) {
         else if(user.hierId){
           userHier = user.hierId;
         }
+        console.log('userHier', userHier)
         var lookUpMobilPhone =  LookUps.findOne({
           lookUpCode: Enums.lookUpTypes.contactMethod.type.lookUpCode,
           hierId: userHier, lookUpActions: "ContactMethod_MobilePhone"});
+        console.log('lookUpMobilPhone', lookUpMobilPhone)
         var phoneTypeId = lookUpMobilPhone ._id;
         var lookUpEmail = LookUps.findOne({
           lookUpCode: Enums.lookUpTypes.contactMethod.type.lookUpCode,
           hierId: userHier, lookUpActions: "ContactMethod_Email"});
+        console.log('emailTypeId', emailTypeId)
         var emailTypeId = lookUpEmail._id;
         _.each(contactMethod, function (cm) {
           if (cm.Telephone)
