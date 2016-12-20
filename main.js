@@ -104,25 +104,20 @@ var extractInformation = function (parseResult, user) {
         userHier = user.hierId;
       }
       var activeStatus = LookUps.findOne({
-        hierId: userHier,
         lookUpCode: Enums.lookUpCodes.active_status,
         isDefault: true
       });
       if (!activeStatus) {
         activeStatus = LookUps.findOne({
-          hierId: userHier,
           lookUpCode: Enums.lookUpCodes.active_status,
           lookUpActions: Enums.lookUpAction.Implies_Active
         });
       }
       var processStatus = LookUps.findOne({
-        hierId: userHier,
         lookUpCode: Enums.lookUpCodes.employee_status,
-        isDefault: true
       });
       if (!processStatus) {
         processStatus = LookUps.findOne({
-          hierId: userHier,
           lookUpCode: Enums.lookUpCodes.employee_status
         });
       }
@@ -152,12 +147,12 @@ var extractInformation = function (parseResult, user) {
         console.log('userHier', userHier)
         var lookUpMobilPhone =  LookUps.findOne({
           lookUpCode: Enums.lookUpTypes.contactMethod.type.lookUpCode,
-          hierId: userHier, lookUpActions: "ContactMethod_MobilePhone"});
+          lookUpActions: "ContactMethod_MobilePhone"});
         console.log('lookUpMobilPhone', lookUpMobilPhone)
         var phoneTypeId = lookUpMobilPhone ._id;
         var lookUpEmail = LookUps.findOne({
           lookUpCode: Enums.lookUpTypes.contactMethod.type.lookUpCode,
-          hierId: userHier, lookUpActions: "ContactMethod_Email"});
+           lookUpActions: "ContactMethod_Email"});
         console.log('emailTypeId', emailTypeId)
         var emailTypeId = lookUpEmail._id;
         _.each(contactMethod, function (cm) {
