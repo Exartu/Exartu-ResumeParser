@@ -1,7 +1,7 @@
 Package.describe({
   summary: "Parse a document",
   name: 'aida:resume-parser',
-  version: '0.0.16',
+  version: '0.0.17',
   documentation: null
 });
 
