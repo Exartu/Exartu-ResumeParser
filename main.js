@@ -103,16 +103,6 @@ var extractInformation = function (parseResult, user) {
       else if(user.hierId){
         userHier = user.hierId;
       }
-      var activeStatus = LookUps.findOne({
-        lookUpCode: Enums.lookUpCodes.active_status,
-        isDefault: true
-      });
-      if (!activeStatus) {
-        activeStatus = LookUps.findOne({
-          lookUpCode: Enums.lookUpCodes.active_status,
-          lookUpActions: Enums.lookUpAction.Implies_Active
-        });
-      }
       var processStatus = LookUps.findOne({
         lookUpCode: Enums.lookUpCodes.employee_status,
       });
@@ -121,7 +111,6 @@ var extractInformation = function (parseResult, user) {
           lookUpCode: Enums.lookUpCodes.employee_status
         });
       }
-      employee.activeStatus = activeStatus._id;
       employee.Employee.status = processStatus._id;
     } catch (e) {
       console.log(e);
@@ -199,13 +188,14 @@ var extractInformation = function (parseResult, user) {
 
     // Person names
     try {
-      if (ContactInfo.PersonName && ContactInfo.PersonName[0]) {
+      if (ContactInfo && ContactInfo.PersonName && ContactInfo.PersonName[0]) {
         var personName = ContactInfo.PersonName[0];
         employee.person = {};
         employee.person.firstName = personName.GivenName ? personName.GivenName.join(' ') : 'GivenName';
         employee.person.middleName = personName.MiddleName ? personName.MiddleName.join(' ') : '';
         employee.person.lastName = personName.FamilyName ? personName.FamilyName.join(' ') : 'FamilyName';
       } else {
+        console.log('Parsing error, no ContactInfo; creating w bogus name Parsed Employee',ContactInfo);
         employee.person.firstName = 'Parsed'
         employee.person.lastName = 'Employee'
       }
@@ -336,5 +326,3 @@ var extractInformation = function (parseResult, user) {
     return employee;
   };
 }
-
-
