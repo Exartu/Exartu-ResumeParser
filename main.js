@@ -65,7 +65,7 @@ ResumeParser = function(configs){
 
         return info;
       } catch (e) {
-        return new Meteor.Error(500, "Error parsing resume");
+        return new Meteor.Error(500, "Error parsing resume", result);
       }
     },
     extractInformation: function (information, user) {
